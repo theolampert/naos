@@ -1,0 +1,10 @@
+{
+  "protocol": "https",
+  "host": "www.nytimes.com",
+  "port": 443,
+
+  "paths": [
+    "/",
+    "/section/world/"
+  ]
+}
