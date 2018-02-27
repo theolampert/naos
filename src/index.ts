@@ -81,13 +81,19 @@ const reportResponse = (result: ResponseMessage) => {
   log(chalk.blue(result.path));
   log(`${chalk.gray('- Status:')} ${formatStatus(result.status)}`);
   log(`${chalk.gray('- Console errors:')} ${formatErrorLength(result.exceptions)}`);
+  if (result.consoleWarnings.length) {
+    result.exceptions.forEach(e => log(`${chalk.gray('--')} ${chalk.red(e)}`));
+  }
   log(`${chalk.gray('- Console warnings:')} ${formatWarningLength(result.consoleWarnings)}`);
+  if (result.consoleWarnings.length) {
+    result.consoleWarnings.forEach(w => log(`${chalk.gray('--')} ${chalk.yellow(w)}`));
+  }
 }
 
 const run = async () => {
   const url = createUrl(protocol, host, port);
   ora(`Running ${url}`).start();
-  
+
   const browser = await puppeteer.launch();
   const runCheck = checkForErrors(browser, url);
 
