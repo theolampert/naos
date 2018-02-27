@@ -1,3 +1,4 @@
+#!/usr/bin/env node 
 import program from 'commander';
 import path from 'path';
 
@@ -13,8 +14,9 @@ const config = (val: string) => {
 }
 
 program
+  .name(pkg.name)
   .version(pkg.version)
-  .option('-c, --config <item>', 'Specify a naos-config.json file.', config)
+  .option('-c, --config <file>', 'Specify a naos-config.json file.', config)
   .parse(process.argv);
 
   const configFile = require(configPath);

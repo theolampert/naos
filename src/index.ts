@@ -48,17 +48,13 @@ const formatStatus = (status: number): string => {
 }
 
 const formatErrorLength = (errors: string[]): string => {
-  if (errors.length) {
-    return `${chalk.red(errors.length.toString())}`;
-  }
-  return `${chalk.green(errors.length.toString())}`;
+  const color = errors.length ? 'red' : 'green';
+  return `${chalk[color](errors.length.toString())}`;
 };
 
 const formatWarningLength = (warnings: string[]): string => {
-  if (warnings.length) {
-    return `${chalk.yellow(warnings.length.toString())}`;
-  }
-  return `${chalk.green(warnings.length.toString())}`;
+  const color = warnings.length ? 'yellow' : 'green';
+  return `${chalk[color](warnings.length.toString())}`;
 };
 
 const reportResponse = (result: ResponseMessage) => {
@@ -81,9 +77,12 @@ const protocol: string = config.protocol || 'http';
 const host: string = config.host || '127.0.0.1';
 const port: string = config.port || '3000';
 
+const reporter = reportResponse;
+
 const paths: string[] = config.paths;
   const url = createUrl(protocol, host, port);
-  ora(`Running ${url}`).start();
+  console.clear();
+  ora(`Running ${chalk.blue(url)}`).start();
 
   const browser = await puppeteer.launch();
   const runCheck = checkForErrors(browser, url);
@@ -93,7 +92,7 @@ const paths: string[] = config.paths;
 
   await browser.close();
 
-  results.forEach(r => reportResponse(r));
+  results.forEach(r => reporter(r));
 
   if (errors.length) {
     process.exit(1);
