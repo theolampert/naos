@@ -1,16 +1,18 @@
 {
-  "name": "error-crawler",
+  "name": "naos",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "dist/index.js",
+  "bin": "dist/cli.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": " tsc --p ./tsconfig.json",
     "build:watch": "npm run build -- --watch",
-    "start": "node index.js"
+    "header": "echo '#!/usr/bin/env node' | cat - ./dist/cli.js > /tmp/out && mv /tmp/out ./dist/cli.js",
+    "postinstall": "npm run build && npm run header"
   },
   "author": "",
-  "license": "ISC",
+  "license": "MIT",
   "dependencies": {
     "chalk": "^2.3.1",
     "cli-spinners": "^1.1.0",
