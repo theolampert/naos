@@ -1,3 +1,21 @@
-import * as program from 'commander';
+import program from 'commander';
+import path from 'path';
 
-console.log(program);
+import { run } from './index';
+import { Config } from './types/types'
+
+const pwd = process.env.PWD;
+const pkg = require('../package.json');
+let configPath: string = path.join(pwd, './naos-config.json');
+
+const config = (val: string) => {
+  configPath = path.join(pwd, val);
+}
+
+program
+  .version(pkg.version)
+  .option('-c, --config <item>', 'Specify a naos-config.json file.', config)
+  .parse(process.argv);
+
+  const configFile = require(configPath);
+  run(configFile);

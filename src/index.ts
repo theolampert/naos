@@ -2,26 +2,12 @@ import puppeteer, { Browser, Page } from 'puppeteer';
 import chalk from 'chalk';
 import ora from 'ora';
 
-const config = require('../config.json');
-const protocol: string = config.protocol || 'http';
-const host: string = config.host || '127.0.0.1';
-const port: string = config.port || '3000';
+import { ResponseMessage, Config } from './types/types';
 
-const paths: string[] = config.paths;
+const createUrl = (protocol: string, host: string, port: string): string =>
+  `${protocol}://${host}:${port}`;
 
-interface ResponseMessage {
-  path: string;
-  exceptions: string[];
-  consoleWarnings: string[];
-  consoleErrors: object[];
-  status: number;
-}
-
-const createUrl = (protocol: string, host: string, port: string): string => {
-  return `${protocol}://${host}:${port}`;
-}
-
-const checkForErrors = (browser: Browser, url: string) => async (path: string) => { 
+const checkForErrors = (browser: Browser, url: string) => async (path: string) => {
   const page: Page = await browser.newPage();
   const responseMessage: ResponseMessage = {
     path,
@@ -80,17 +66,22 @@ const reportResponse = (result: ResponseMessage) => {
   log('\b');
   log(chalk.blue(result.path));
   log(`${chalk.gray('- Status:')} ${formatStatus(result.status)}`);
-  log(`${chalk.gray('- Console errors:')} ${formatErrorLength(result.exceptions)}`);
+  log(`${chalk.gray('- Errors:')} ${formatErrorLength(result.exceptions)}`);
   if (result.consoleWarnings.length) {
     result.exceptions.forEach(e => log(`${chalk.gray('--')} ${chalk.red(e)}`));
   }
-  log(`${chalk.gray('- Console warnings:')} ${formatWarningLength(result.consoleWarnings)}`);
+  log(`${chalk.gray('- Warnings:')} ${formatWarningLength(result.consoleWarnings)}`);
   if (result.consoleWarnings.length) {
     result.consoleWarnings.forEach(w => log(`${chalk.gray('--')} ${chalk.yellow(w)}`));
   }
 }
 
-const run = async () => {
+export const run = async (config: Config) => {
+const protocol: string = config.protocol || 'http';
+const host: string = config.host || '127.0.0.1';
+const port: string = config.port || '3000';
+
+const paths: string[] = config.paths;
   const url = createUrl(protocol, host, port);
   ora(`Running ${url}`).start();
 
@@ -108,9 +99,6 @@ const run = async () => {
     process.exit(1);
     console.log(errors);
   } else {
-    console.log('No errors here. 🎉');
     process.exit(0);
   }
 };
-
-run();
