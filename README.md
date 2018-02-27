@@ -16,6 +16,24 @@ npm install -g naos
 ```
 
 ### Running
+
+First create a config.json file like so:
+```json
+{
+  "protocol": "https",
+  "host": "www.nytimes.com",
+  "port": 443,
+
+  "paths": [
+    "/",
+    "/section/world/",
+  ]
+}
+
+```
+
+And begin scraping:
+
 ```sh
 naos --config ./config.json
 ```
