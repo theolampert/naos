@@ -38,7 +38,3 @@ And begin scraping:
 naos --config ./config.json
 ```
 
-##### With JSON output
-```sh
-naos --config ./config.json --format json
-```
