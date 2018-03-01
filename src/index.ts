@@ -2,7 +2,10 @@ import puppeteer, { Browser, Page } from 'puppeteer';
 import chalk from 'chalk';
 import ora from 'ora';
 
-import { ResponseMessage, Config } from './types/types';
+import {
+  Config,
+  ResponseMessage,
+} from './types/types';
 
 const createUrl = (protocol: string, host: string, port: string): string =>
   `${protocol}://${host}:${port}`;
@@ -78,11 +81,6 @@ const jsonReporter = (result: object[]) => {
   log(JSON.stringify(result));
 }
 
-const reporters = {
-  'pretty': chalkReporter,
-  'json': jsonReporter,
-}
-
 export const run = async (config: Config, reporter: string) => {
   const protocol: string = config.protocol || 'http';
   const host: string = config.host || '127.0.0.1';
@@ -102,7 +100,13 @@ export const run = async (config: Config, reporter: string) => {
 
   await browser.close();
 
-  reporters[reporter](results);
+  switch (reporter) {
+    case 'json':
+      jsonReporter(results);
+      break;
+    default:
+      chalkReporter(results);
+  }
 
   if (errors.length) {
     process.exit(1);

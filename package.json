@@ -11,7 +11,7 @@
     "header": "echo '#!/usr/bin/env node' | cat - ./dist/cli.js > /tmp/out && mv /tmp/out ./dist/cli.js",
     "postinstall": "npm run build && npm run header"
   },
-  "author": "",
+  "author": "theolampert",
   "license": "MIT",
   "dependencies": {
     "chalk": "^2.3.1",
