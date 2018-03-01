@@ -1,8 +1,7 @@
 export interface ResponseMessage {
   path: string;
   exceptions: string[];
-  consoleWarnings: string[];
-  consoleErrors: object[];
+  warnings: string[];
   status: number;
 }
 
