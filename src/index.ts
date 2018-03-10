@@ -101,9 +101,11 @@ export const run = async (config: Config, reporter: string) => {
   await browser.close();
 
   switch (reporter) {
-    case 'json':
+    case 'json-stdout':
       jsonReporter(results);
       break;
+    case 'json':
+      return JSON.stringify(results);
     default:
       chalkReporter(results);
   }
