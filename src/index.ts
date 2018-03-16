@@ -20,7 +20,7 @@ const checkForErrors = (browser: Browser, url: string) => async (path: string) =
   };
 
   page.on('pageerror', (error) => {
-    responseMessage.exceptions.push(error);
+    responseMessage.exceptions.push(error.toString());
   });
 
   page.on('response', (response) => {
