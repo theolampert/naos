@@ -54,48 +54,50 @@ const server = app.listen(port);
     server.close();
     const r = JSON.parse(result);
 
-    test('handles 200 response correctly', (t) => {
-      t.equals(r[0].warnings.length, 0);
-      t.equals(r[0].exceptions.length, 0);
-      t.equals(r[0].status, 200);
+    test('handles responses correctly', (t) => {
+      t.test('Handles 200', (assert) => {
+        const index = 0;
+        assert.equals(r[index].warnings.length, 0);
+        assert.equals(r[index].exceptions.length, 0);
+        assert.equals(r[index].status, 200);
+        assert.end();
+      });
+
+      t.test('Handles 300', (assert) => {
+        const index = 1;
+        assert.equals(r[index].warnings.length, 0);
+        assert.equals(r[index].exceptions.length, 0);
+        assert.equals(r[index].status, 300);
+        assert.end();
+      });
+
+      t.test('Handles 400', (assert) => {
+        const index = 2;
+        assert.equals(r[index].warnings.length, 0);
+        assert.equals(r[index].exceptions.length, 0);
+        assert.equals(r[index].status, 400);
+        assert.end();
+      });
+
+      t.test('handles browser warnings', (assert) => {
+        const index = 3;
+        assert.equals(r[index].warnings.length, 1);
+        assert.equals(r[index].exceptions.length, 0);
+        assert.equals(r[index].status, 200);
+        assert.equals(r[index].warnings[0], 'warning');
+        assert.end();
+      });
+
+      t.test('handles browser errors', (assert) => {
+        const index = 4;
+        assert.equals(r[index].warnings.length, 0);
+        assert.equals(r[index].exceptions.length, 1);
+        assert.equals(r[index].status, 200);
+        assert.equals(r[index].exceptions[0], 'Error: Error: error text\n    at http://127.0.0.1:3000/exception:1:21');
+        assert.end();
+      });
 
       t.end();
-    });
-
-    test('handles 300 response correctly', (t) => {
-      t.equals(r[1].warnings.length, 0);
-      t.equals(r[1].exceptions.length, 0);
-      t.equals(r[1].status, 300);
-
-      t.end();
-    });
-
-    test('handles 400 response correctly', (t) => {
-      t.equals(r[2].warnings.length, 0);
-      t.equals(r[2].exceptions.length, 0);
-      t.equals(r[2].status, 400);
-
-      t.end();
-    });
-
-    test('handles browser warning response correctly', (t) => {
-      t.equals(r[3].warnings.length, 1);
-      t.equals(r[3].exceptions.length, 0);
-      t.equals(r[3].status, 200);
-      t.equals(r[3].warnings[0], 'warning');
-
-      t.end();
-    });
-
-    test('handles browser error response correctly', (t) => {
-      t.equals(r[4].warnings.length, 0);
-      t.equals(r[4].exceptions.length, 1);
-      t.equals(r[4].status, 200);
-
-      t.equals(r[4].exceptions[0], 'Error: Error: error text\n    at http://127.0.0.1:3000/exception:1:21');
-
-      t.end();
-
       process.exit();
     });
   });
