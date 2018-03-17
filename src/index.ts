@@ -2,7 +2,10 @@ import puppeteer, { Browser, Page } from 'puppeteer';
 import chalk from 'chalk';
 import ora from 'ora';
 
-import { ResponseMessage, Config } from './types/types';
+import {
+  Config,
+  ResponseMessage,
+} from './types/types';
 
 const createUrl = (protocol: string, host: string, port: string): string =>
   `${protocol}://${host}:${port}`;
@@ -11,14 +14,13 @@ const checkForErrors = (browser: Browser, url: string) => async (path: string) =
   const page: Page = await browser.newPage();
   const responseMessage: ResponseMessage = {
     path,
-    consoleErrors: [],
-    consoleWarnings: [],
+    warnings: [],
     status: null,
     exceptions: [],
   };
 
   page.on('pageerror', (error) => {
-    responseMessage.exceptions.push(error);
+    responseMessage.exceptions.push(error.toString());
   });
 
   page.on('response', (response) => {
@@ -28,7 +30,7 @@ const checkForErrors = (browser: Browser, url: string) => async (path: string) =
   page.on('console', msg => {
     for (let i = 0; i < msg.args().length; ++i)
       if (msg.type() === 'warning') {
-        responseMessage.consoleWarnings.push(msg.text());
+        responseMessage.warnings.push(msg.text());
       }
   });
 
@@ -57,30 +59,36 @@ const formatWarningLength = (warnings: string[]): string => {
   return `${chalk[color](warnings.length.toString())}`;
 };
 
-const reportResponse = (result: ResponseMessage) => {
+const chalkReporter = (results: object[]) => {
   const log = console.log;
   log('\b');
-  log(chalk.blue(result.path));
-  log(`${chalk.gray('- Status:')} ${formatStatus(result.status)}`);
-  log(`${chalk.gray('- Errors:')} ${formatErrorLength(result.exceptions)}`);
-  if (result.consoleWarnings.length) {
-    result.exceptions.forEach(e => log(`${chalk.gray('--')} ${chalk.red(e)}`));
-  }
-  log(`${chalk.gray('- Warnings:')} ${formatWarningLength(result.consoleWarnings)}`);
-  if (result.consoleWarnings.length) {
-    result.consoleWarnings.forEach(w => log(`${chalk.gray('--')} ${chalk.yellow(w)}`));
-  }
+  results.forEach((result: ResponseMessage) => {
+    log(chalk.blue(result.path));
+    log(`${chalk.gray('- Status:')} ${formatStatus(result.status)}`);
+    log(`${chalk.gray('- Errors:')} ${formatErrorLength(result.exceptions)}`);
+    if (result.warnings.length) {
+      result.exceptions.forEach(e => log(`${chalk.gray('--')} ${chalk.red(e)}`));
+    }
+    log(`${chalk.gray('- Warnings:')} ${formatWarningLength(result.warnings)}`);
+    if (result.warnings.length) {
+      result.warnings.forEach(w => log(`${chalk.gray('--')} ${chalk.yellow(w)}`));
+    }
+  });
 }
 
-export const run = async (config: Config) => {
-const protocol: string = config.protocol || 'http';
-const host: string = config.host || '127.0.0.1';
-const port: string = config.port || '3000';
+const jsonReporter = (result: object[]) => {
+  const log = console.log;
+  log(JSON.stringify(result));
+}
 
-const reporter = reportResponse;
+export const run = async (config: Config, reporter: string) => {
+  const protocol: string = config.protocol || 'http';
+  const host: string = config.host || '127.0.0.1';
+  const port: string = config.port || '3000';
 
-const paths: string[] = config.paths;
+  const paths: string[] = config.paths;
   const url = createUrl(protocol, host, port);
+
   console.clear();
   ora(`Running ${chalk.blue(url)}`).start();
 
@@ -92,7 +100,15 @@ const paths: string[] = config.paths;
 
   await browser.close();
 
-  results.forEach(r => reporter(r));
+  switch (reporter) {
+    case 'json-stdout':
+      jsonReporter(results);
+      break;
+    case 'json':
+      return JSON.stringify(results);
+    default:
+      chalkReporter(results);
+  }
 
   if (errors.length) {
     process.exit(1);
