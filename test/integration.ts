@@ -1,5 +1,5 @@
-import express from 'express';
-import { test } from 'tape';
+import express = require('express');
+import test = require('tape');
 import { run } from '../src';
 
 const app = express();
