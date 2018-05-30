@@ -6,7 +6,7 @@
   "bin": "dist/cli.js",
   "scripts": {
     "test": "ts-node test/integration.ts",
-    "build": " tsc --p ./tsconfig.json",
+    "build": "npx tsc --p ./tsconfig.json",
     "build:watch": "npm run build -- --watch",
     "header": "echo '#!/usr/bin/env node' | cat - ./dist/cli.js > /tmp/out && mv /tmp/out ./dist/cli.js",
     "postinstall": "npm run build && npm run header"
